@@ -21,6 +21,23 @@
         </el-select>
       </div>
 
+      <div class="model-selector">
+        <el-select v-model="currentModelName" placeholder="选择模型" size="small">
+          <el-option
+            v-for="model in models"
+            :key="model.id"
+            :label="model.name"
+            :value="model.name"
+          >
+            <span>{{ model.name }}</span>
+            <el-tag v-if="model.isDefault" size="small" type="success" style="margin-left:8px">默认</el-tag>
+          </el-option>
+        </el-select>
+        <div v-if="models.length === 0" class="model-hint">
+          请先在「模型管理」中添加模型
+        </div>
+      </div>
+
       <div class="session-list">
         <div
           v-for="session in sessions"
@@ -73,6 +90,9 @@
               v-html="renderMarkdown(msg.content)"
             />
             <div v-else class="message-content">{{ msg.content }}</div>
+            <div v-if="msg.role === 'ASSISTANT' && msg.modelName" class="message-model">
+              {{ msg.modelName }}
+            </div>
             <div v-if="msg.sources && msg.sources.length > 0" class="message-sources">
               <div class="sources-label" @click="msg._showSources = !msg._showSources">
                 <el-icon :size="14"><Document /></el-icon>
@@ -131,6 +151,7 @@ import { Plus, Promotion, Close, ArrowDown, ArrowUp } from '@element-plus/icons-
 import { ElMessageBox } from 'element-plus'
 import { listKnowledgeBases } from '@/api/knowledge'
 import { sendMessage as sendChatMessage, listSessions, getSessionMessages, deleteSession } from '@/api/chat'
+import { listEnabledModels } from '@/api/model'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
@@ -154,11 +175,25 @@ const messages = ref([])
 const inputText = ref('')
 const loading = ref(false)
 const messagesRef = ref(null)
+const models = ref([])
+const currentModelName = ref(null)
 
 onMounted(async () => {
   try {
-    const res = await listKnowledgeBases()
-    knowledgeBases.value = res.data || []
+    const [kbRes, modelRes] = await Promise.all([
+      listKnowledgeBases(),
+      listEnabledModels()
+    ])
+    knowledgeBases.value = kbRes.data || []
+    models.value = modelRes.data || []
+    
+    const defaultModel = models.value.find(m => m.isDefault)
+    if (defaultModel) {
+      currentModelName.value = defaultModel.name
+    } else if (models.value.length > 0) {
+      currentModelName.value = models.value[0].name
+    }
+    
     const defaultKb = knowledgeBases.value.find(kb => kb.isDefault)
     if (defaultKb) {
       currentKbId.value = defaultKb.id
@@ -223,7 +258,8 @@ async function sendMessage() {
     const res = await sendChatMessage({
       sessionId: currentSessionId.value,
       knowledgeBaseId: currentKbId.value,
-      message: text
+      message: text,
+      modelName: currentModelName.value
     })
     const data = res.data
     if (!currentSessionId.value && data.sessionId) {
@@ -293,10 +329,22 @@ function scrollToBottom() {
   color: var(--text-primary);
 }
 
-.kb-selector {
+.kb-selector, .model-selector {
   padding: 0 16px 12px;
 
   .el-select { width: 100%; }
+}
+
+.model-selector {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+}
+
+.model-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: center;
 }
 
 .session-list {
@@ -501,6 +549,13 @@ function scrollToBottom() {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.message-model {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  opacity: 0.7;
 }
 
 // 打字动画

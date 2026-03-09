@@ -35,14 +35,10 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY:}
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
-      chat:
-        options:
-          model: gpt-4o
-          temperature: 0.7
+      base-url: ${OPENAI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
       embedding:
         options:
-          model: text-embedding-ada-002
+          model: ${EMBEDDING_MODEL:text-embedding-v3}
     vectorstore:
       milvus:
         client:
@@ -50,7 +46,7 @@ spring:
           port: 19530
         database-name: default
         collection-name: rag_vectors
-        embedding-dimension: 1536
+        embedding-dimension: ${EMBEDDING_DIMENSION:1024}
 
 # MinIO 配置
 minio:
