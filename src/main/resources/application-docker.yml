@@ -12,7 +12,10 @@ spring:
   ai:
     openai:
       api-key: ${SPRING_AI_OPENAI_API_KEY:}
-      base-url: ${SPRING_AI_OPENAI_BASE_URL:https://api.openai.com}
+      base-url: ${SPRING_AI_OPENAI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:text-embedding-v3}
     vectorstore:
       milvus:
         client:
