@@ -44,9 +44,11 @@ public class VectorStoreService {
     }
 
     public List<Document> search(String query, Long knowledgeBaseId, int topK) {
-        SearchRequest request = SearchRequest.from(query)
-                .withTopK(topK)
-                .withFilterExpression("knowledgeBaseId == '" + knowledgeBaseId + "'");
+        SearchRequest request = SearchRequest.builder()
+                .query(query)
+                .topK(topK)
+                .filterExpression("knowledgeBaseId == '" + knowledgeBaseId + "'")
+                .build();
 
         return vectorStore.similaritySearch(request);
     }
