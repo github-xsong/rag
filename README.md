@@ -38,7 +38,7 @@
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/your-username/rag.git
+git clone https://github.com/github-xsong/rag.git
 cd rag
 
 # 2. 配置环境变量
