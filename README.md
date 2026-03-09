@@ -46,7 +46,7 @@ cp .env.example .env
 # 编辑 .env，填入你的 API Key 等配置
 
 # 3. 一键启动（首次会自动构建，约 3-5 分钟）
-docker-compose up -d
+sudo docker compose up -d
 
 # 4. 查看服务状态
 docker-compose ps
