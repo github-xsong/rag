@@ -29,10 +29,11 @@
 
 ### 环境要求
 
+- JDK 17+
+- Maven 3.8+
+- Node.js 18+
 - Docker & Docker Compose
 - 一个可用的 LLM API Key（OpenAI 或兼容接口）
-
-> 无需安装 JDK、Maven、Node.js — Docker 会自动完成前后端编译。
 
 ### 部署步骤
 
@@ -45,10 +46,19 @@ cd rag
 cp .env.example .env
 # 编辑 .env，填入你的 API Key 等配置
 
-# 3. 一键启动（首次会自动构建，约 3-5 分钟）
-sudo docker compose up -d
+# 3. 构建后端
+mvn clean package -DskipTests
 
-# 4. 查看服务状态
+# 4. 构建前端
+cd frontend
+npm install
+npm run build
+cd ..
+
+# 5. 启动服务
+docker-compose up -d
+
+# 6. 查看服务状态
 docker-compose ps
 ```
 
@@ -138,7 +148,7 @@ rag/
 │   ├── model/               # 模型管理模块
 │   └── openapi/             # 开放 API 模块
 ├── docker-compose.yml       # 一键部署编排
-├── Dockerfile               # 后端多阶段构建
+├── Dockerfile               # 后端运行镜像
 └── .env.example             # 环境变量模板
 ```
 

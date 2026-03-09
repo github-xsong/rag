@@ -1,17 +1,6 @@
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY settings.xml /root/.m2/settings.xml
-COPY pom.xml .
-RUN mvn dependency:go-offline -B \
-    || (find /root/.m2/repository -name "*.jar" -size 0 -delete && \
-        find /root/.m2/repository -name "*.jar" -exec sh -c 'unzip -t "$1" > /dev/null 2>&1 || rm -f "$1"' _ {} \; && \
-        mvn dependency:go-offline -B)
-COPY src ./src
-RUN mvn clean package -DskipTests -B
-
-FROM eclipse-temurin:17-jre-alpine AS runtime
-WORKDIR /app
-COPY --from=build /app/target/rag-1.0.0.jar app.jar
+COPY target/rag-1.0.0.jar app.jar
 
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 EXPOSE 8080
