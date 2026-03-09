@@ -56,10 +56,10 @@ npm run build
 cd ..
 
 # 5. 启动服务
-docker-compose up -d
+docker compose up -d
 
 # 6. 查看服务状态
-docker-compose ps
+docker compose ps
 ```
 
 启动完成后访问：
