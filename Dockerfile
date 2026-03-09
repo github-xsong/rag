@@ -2,7 +2,10 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY settings.xml /root/.m2/settings.xml
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B \
+    || (find /root/.m2/repository -name "*.jar" -size 0 -delete && \
+        find /root/.m2/repository -name "*.jar" -exec sh -c 'unzip -t "$1" > /dev/null 2>&1 || rm -f "$1"' _ {} \; && \
+        mvn dependency:go-offline -B)
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
