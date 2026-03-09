@@ -44,7 +44,7 @@ public class VectorStoreService {
     }
 
     public List<Document> search(String query, Long knowledgeBaseId, int topK) {
-        SearchRequest request = SearchRequest.query(query)
+        SearchRequest request = SearchRequest.from(query)
                 .withTopK(topK)
                 .withFilterExpression("knowledgeBaseId == '" + knowledgeBaseId + "'");
 

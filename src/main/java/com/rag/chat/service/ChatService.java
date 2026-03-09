@@ -60,14 +60,14 @@ public class ChatService {
                 request.getMessage(), knowledgeBaseId, request.getTopK());
 
         String context = relevantDocs.stream()
-                .map(Document::getContent)
+                .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
         List<Map<String, String>> sources = relevantDocs.stream()
                 .map(doc -> {
                     Map<String, String> source = new HashMap<>();
                     source.put("fileName", doc.getMetadata().getOrDefault("fileName", "").toString());
-                    source.put("content", doc.getContent().substring(0, Math.min(200, doc.getContent().length())));
+                    source.put("content", doc.getText().substring(0, Math.min(200, doc.getText().length())));
                     return source;
                 })
                 .collect(Collectors.toList());
